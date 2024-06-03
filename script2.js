@@ -38,3 +38,8 @@ function weatherShowFn(data) {
 			`...`);
 	$('#weather-info').fadeIn();
 }
+
+// ---Reset filter 
+function resetInputField() {
+	document.getElementById("city-input").value = "";
+  }

@@ -20,8 +20,11 @@
         <h3>
             Weather App
         </h3>
-        <input type="text" id="city-input"
-               placeholder="Enter city name">
+        <div class="input-city-container"> 
+            <input type="text" id="city-input" placeholder="Enter city name">
+            <span type="button" class="reset-button" onclick="resetInputField()" disabled>
+              <i class="fas fa-times"></i> </span>
+          </div>
         <button id="city-input-btn"
                 onclick="weatherFn($('#city-input').val())">
                 Get Weather

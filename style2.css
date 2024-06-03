@@ -1,11 +1,13 @@
 body {
-    margin: 0;
+    margin: 0 auto;
     font-family: 'Montserrat', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(to right, #4CAF50, #2196F3);
+    height: 100%;
+    background-image:url("./back-ground-image.jpg") ;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .container {
@@ -118,3 +120,40 @@ body {
         font-size: 16px;
     }
 }
+#city-name{
+    width: max-content;
+    padding: 8px 10px;
+    border-radius: 5%;
+    background-color:#2196F3;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+#city-form span {
+    float: right; /* Or use Flexbox from previous example */
+    border: none;
+    background-color: transparent;
+    padding: 5px; /* Adjust padding if needed */
+    border-radius: 50%; /* Make the button circular */
+    cursor: pointer; /* Indicate clickable behavior */
+  }
+
+ 
+  .input-city-container{
+    display: flex;
+
+    & .reset-button{
+        display: inherit; /* Inherit display from parent */
+        float: right; /* Float right for right alignment */
+        justify-content: center; /* Not required for this button */
+        cursor: pointer; /* Indicate clickable behavior */
+        font-size: 18px;
+        position: relative;
+        right: 35px;
+        align-items: center;
+        border: none; /* Remove default button border */   
+    }
+  }

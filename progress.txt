@@ -1,0 +1,4 @@
+1)Need backrgound color like animated images and should be like blur glass type
+2)the main container should be blur 
+3)below input filed need to add few options along with city icons
+4)Take permisson form user to access location and give input input to input filed 
