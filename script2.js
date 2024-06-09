@@ -1,9 +1,6 @@
 const url = 'https://api.openweathermap.org/data/2.5/weather';
 const apiKey = 'f00c38e0279b7bc85480c3fe775d518c';
 
-$(document).ready(function () {
-    weatherFn('hyderabad');
-});
 
 async function weatherFn(cName) {
     const temp = `${url}?q=${cName}&appid=${apiKey}&units=metric`;
@@ -13,7 +10,7 @@ async function weatherFn(cName) {
         if (res.ok) {
             weatherShowFn(data);
         } else {
-            alert('City not found. Please try again.');
+            showToast('Sorry', 'City not found. Please try again.');
         }
     } catch (error) {
         console.error('Error fetching weather data:', error);
@@ -54,20 +51,11 @@ function updateWeatherIcon(description) {
 }
 
 
-     // Disable right-click context menu
-     document.addEventListener('contextmenu', function(event) {
-        event.preventDefault();
-    });
-
-    // Optional: Add a message to notify the user
-    document.addEventListener('contextmenu', function(event) {
-        alert("Right-click is disabled on this page.");
-    });
-
-
-// ---Reset filter 
+  // ---Reset filter 
 function resetInputField() {
 	document.getElementById("city-input").value = "";
+    const weatherCard = document.getElementById('weather-info');
+    weatherCard.style.display='none';
   }
 
 
@@ -81,7 +69,7 @@ function resetInputField() {
 		  // Remove "active-facet" class and uncheck the checkbox
 		  facetElement.classList.remove('active-facet');
 		  const checkbox = list.querySelector(`input[type="checkbox"][id="${facetElement.id}"]`);
-		  if (checkbox) {
+		  if (checkbox) {  
 			checkbox.checked = false; // Uncheck the corresponding checkbox
 		  }
 		});
@@ -108,9 +96,9 @@ function updateTemperatureColor(temperature) {
     } else if (temperature >= 24 && temperature <= 29) {
         temperatureElement.style.color = '#2a52be';
     } else if (temperature >= 30 && temperature <= 35) {
-        temperatureElement.style.color = 'orange';
+        temperatureElement.style.color = '#FF4500';
     } else if (temperature > 35) {
-        temperatureElement.style.color = 'red';
+        temperatureElement.style.color = '#B22222';
     }
 }
 
@@ -133,3 +121,42 @@ observer.observe(temperatureElement, {
 
 // Initial color update
 updateTemperatureColor(parseInt(temperatureElement.textContent, 10));
+
+
+// toast notification
+function showToast(title, message) {
+    const toast = $(`
+        <div class="toast">
+            <div class="toast-content">
+                <i class="fas fa-exclamation-circle toast-check"></i>
+                <div class="message">
+                    <span class="message-text text-1">${title}</span>
+                    <span class="message-text text-2">${message}</span>
+                </div>
+            </div>
+            <i class="fas fa-times toast-close"></i>
+            <div class="progress"></div>
+        </div>
+    `);
+
+    $('#toast-container').append(toast);
+
+    setTimeout(() => {
+        toast.addClass('active');
+        toast.find('.progress').addClass('active');
+    }, 100); // Allow for the DOM to render before adding the class
+
+    setTimeout(() => {
+        toast.removeClass('active');
+        setTimeout(() => {
+            toast.remove();
+        }, 500); // Allow for the exit transition before removing from DOM
+    }, 3000); // Display for 3 seconds
+
+    toast.find('.toast-close').click(() => {
+        toast.removeClass('active');
+        setTimeout(() => {
+            toast.remove();
+        }, 500); // Allow for the exit transition before removing from DOM
+    });
+}
