@@ -414,7 +414,6 @@ body {
   height: 100%;
   width: 100%;
   background-color: rgb(248, 65, 65);
-  border-radius: 50%;
 }
 
 .progress.active::before {
@@ -425,4 +424,27 @@ body {
   100% {
       right: 100%;
   }
+}
+
+#get-location{
+  padding: 8px 16px;
+  font-size: 20px;
+  background: #2196F3;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+
+}
+#city-input-btn{
+ gap: 20px;
+}
+#location{
+  font-weight: 500;
+  background:#2196F3 ;
+  max-width: fit-content;
+  padding: 8px 16px;
+  color: #fff;
+  display: inline-flex;
+  border-radius: 5px;
 }

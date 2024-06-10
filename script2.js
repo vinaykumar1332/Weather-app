@@ -1,19 +1,43 @@
-const url = 'https://api.openweathermap.org/data/2.5/weather';
+const weatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
+const geocodeUrl = 'http://api.openweathermap.org/geo/1.0/direct';
+const reverseGeocodeUrl = 'http://api.openweathermap.org/geo/1.0/reverse';
 const apiKey = 'f00c38e0279b7bc85480c3fe775d518c';
 
+$(document).ready(function () {
+    weatherFn('Pune');
+});
 
 async function weatherFn(cName) {
-    const temp = `${url}?q=${cName}&appid=${apiKey}&units=metric`;
+    const temp = `${weatherUrl}?q=${cName}&appid=${apiKey}&units=metric`;
     try {
         const res = await fetch(temp);
         const data = await res.json();
         if (res.ok) {
             weatherShowFn(data);
+            await getGeocodeData(cName); // Fetch and display country and state details
         } else {
-            showToast('Sorry', 'City not found. Please try again.');
+            showToast('Error', 'City not found. Please try again.');
         }
     } catch (error) {
         console.error('Error fetching weather data:', error);
+        showToast('Error', 'Failed to fetch weather data.');
+    }
+}
+
+async function getGeocodeData(city) {
+    const geocode = `${geocodeUrl}?q=${city}&limit=1&appid=${apiKey}`;
+    try {
+        const res = await fetch(geocode);
+        const data = await res.json();
+        if (data.length > 0) {
+            const location = data[0];
+            $('#location').text(`${location.state}, ${location.country}`);
+        } else {
+            showToast('Error', 'Location details not found.');
+        }
+    } catch (error) {
+        console.error('Error fetching geocode data:', error);
+        showToast('Error', 'Failed to fetch location details.');
     }
 }
 
@@ -45,85 +69,9 @@ function updateWeatherIcon(description) {
         iconSrc = 'icons/default.png'; // Path to a default icon
     }
 
-    console.log(`Updating icon to: ${iconSrc}`); // Debugging line
     $('#weather-icon').attr('src', iconSrc);
-    console.log(`Icon src attribute is now: ${$('#weather-icon').attr('src')}`); // Debugging line
 }
 
-
-  // ---Reset filter 
-function resetInputField() {
-	document.getElementById("city-input").value = "";
-    const weatherCard = document.getElementById('weather-info');
-    weatherCard.style.display='none';
-  }
-
-
-
-  function resetFilters() {
-	const allFacetLists = document.querySelectorAll('.facet-single-selection-list');
-  
-	allFacetLists.forEach(list => {
-	  list.querySelectorAll('.facet-search-filter.has-active-facet .facet-value.active-facet')
-		.forEach(facetElement => {
-		  // Remove "active-facet" class and uncheck the checkbox
-		  facetElement.classList.remove('active-facet');
-		  const checkbox = list.querySelector(`input[type="checkbox"][id="${facetElement.id}"]`);
-		  if (checkbox) {  
-			checkbox.checked = false; // Uncheck the corresponding checkbox
-		  }
-		});
-	});
-  }
-  
-  // Attach event listener to the reset button
-  const resetButton = document.querySelector('.reset-filter-button');
-  if (resetButton) {
-
-	resetButton.addEventListener('click', (event)=>{
-        event.preventDefault();
-		resetFilters();
-	});
-  }
-  
-
-//   -----
-const temperatureElement = document.getElementById('temperature');
-
-function updateTemperatureColor(temperature) {
-    if (temperature < 24) {
-        temperatureElement.style.color = '#0066b2';
-    } else if (temperature >= 24 && temperature <= 29) {
-        temperatureElement.style.color = '#2a52be';
-    } else if (temperature >= 30 && temperature <= 35) {
-        temperatureElement.style.color = '#FF4500';
-    } else if (temperature > 35) {
-        temperatureElement.style.color = '#B22222';
-    }
-}
-
-const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        if (mutation.type === 'characterData' || mutation.type === 'childList') {
-            const newTemperature = parseInt(temperatureElement.textContent, 10);
-            if (!isNaN(newTemperature)) {
-                updateTemperatureColor(newTemperature);
-            }
-        }
-    });
-});
-
-observer.observe(temperatureElement, {
-    characterData: true,
-    childList: true,
-    subtree: true
-});
-
-// Initial color update
-updateTemperatureColor(parseInt(temperatureElement.textContent, 10));
-
-
-// toast notification
 function showToast(title, message) {
     const toast = $(`
         <div class="toast">
@@ -160,3 +108,128 @@ function showToast(title, message) {
         }, 500); // Allow for the exit transition before removing from DOM
     });
 }
+
+//-- geo code
+
+$(document).ready(function () {
+    $('#get-location').click(function () {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            showToast('Error', 'Geolocation is not supported by this browser.');
+        }
+    });
+});
+
+async function getWeatherByCoords(lat, lon) {
+    const temp = `${weatherUrl}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+    try {
+        const res = await fetch(temp);
+        const data = await res.json();
+        if (res.ok) {
+            weatherShowFn(data);
+            await getReverseGeocodeData(lat, lon);
+        } else {
+            showToast('Error', 'Weather data not found for your location.');
+        }
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+        showToast('Error', 'Failed to fetch weather data.');
+    }
+}
+
+async function getReverseGeocodeData(lat, lon) {
+    const geocode = `${reverseGeocodeUrl}?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
+    try {
+        const res = await fetch(geocode);
+        const data = await res.json();
+        if (data.length > 0) {
+            const location = data[0];
+            $('#city-name').text(location.name);
+            $('#location').text(`${location.state}, ${location.country}`);
+        } else {
+            showToast('Error', 'Location details not found.');
+        }
+    } catch (error) {
+        console.error('Error fetching reverse geocode data:', error);
+        showToast('Error', 'Failed to fetch location details.');
+    }
+}
+
+function showPosition(position) {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    getWeatherByCoords(lat, lon);
+}
+
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            showToast('Error', 'User denied the request for Geolocation.');
+            break;
+        case error.POSITION_UNAVAILABLE:
+            showToast('Error', 'Location information is unavailable.');
+            break;
+        case error.TIMEOUT:
+            showToast('Error', 'The request to get user location timed out.');
+            break;
+        case error.UNKNOWN_ERROR:
+            showToast('Error', 'An unknown error occurred.');
+            break;
+    }
+}
+
+
+
+//------------------------------reset filter buttons
+  // ---Reset filter 
+  function resetInputField() {
+	document.getElementById("city-input").value = "";
+    const weatherCard = document.getElementById('weather-info');
+    weatherCard.style.display='none';
+  }
+
+
+
+  function resetFilters() {
+	const allFacetLists = document.querySelectorAll('.facet-single-selection-list');
+  
+	allFacetLists.forEach(list => {
+	  list.querySelectorAll('.facet-search-filter.has-active-facet .facet-value.active-facet')
+		.forEach(facetElement => {
+		  // Remove "active-facet" class and uncheck the checkbox
+		  facetElement.classList.remove('active-facet');
+		  const checkbox = list.querySelector(`input[type="checkbox"][id="${facetElement.id}"]`);
+		  if (checkbox) {  
+			checkbox.checked = false; // Uncheck the corresponding checkbox
+		  }
+		});
+	});
+  }
+  
+  // Attach event listener to the reset button
+  const resetButton = document.querySelector('.reset-filter-button');
+  if (resetButton) {
+
+	resetButton.addEventListener('click', (event)=>{
+        event.preventDefault();
+		resetFilters();
+	});
+  }
+
+
+//right click
+$(document).on({
+    "contextmenu": function (e) {
+        console.log("ctx menu button:", e.which); 
+
+        // Stop the context menu
+        e.preventDefault();
+    },
+    "mousedown": function(e) { 
+        console.log("normal mouse down:", e.which); 
+    },
+    "mouseup": function(e) { 
+        console.log("normal mouse up:", e.which); 
+    }
+});
