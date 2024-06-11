@@ -175,7 +175,7 @@ async function getReverseGeocodeData(lat, lon) {
             $('#city-name').text(location.name);
             $('#location').text(`${location.state}, ${location.country}`);
         } else {
-            showToast('Error', 'Location details not found.');
+            
         }
     } catch (error) {
         console.error('Error fetching reverse geocode data:', error);
