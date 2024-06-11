@@ -71,6 +71,33 @@ function updateWeatherIcon(description) {
 
     $('#weather-icon').attr('src', iconSrc);
 }
+function weatherShowFn(data) {
+    $('#city-name').text(data.name);
+    $('#date').text(moment().format('MMMM Do YYYY, h:mm:ss a'));
+    const temperature = data.main.temp;
+    const temperatureElement = $('#temperature');
+    temperatureElement.html(`${temperature}°C`);
+
+    // Set temperature color based on value
+    if (temperature < 24) {
+        temperatureElement.css('color', 'blue');
+    } else if (temperature >= 24 && temperature <= 28) {
+        temperatureElement.css('color', '#0076CE');
+    } else if (temperature >= 29 && temperature <= 34) {
+        temperatureElement.css('color', 'orange');
+    } else if (temperature >= 35 && temperature <= 40) {
+        temperatureElement.css('color', 'darkorange');
+        showToast('Warning', 'Temperature is extremely high. Please stay inside.');
+    } else if (temperature > 40) {
+        temperatureElement.css('color', 'red');
+        showToast('Warning', 'Temperature is extremely high. Please stay inside.');
+    }
+
+    $('#description').text(data.weather[0].description);
+    $('#wind-speed').html(`Wind Speed: ${data.wind.speed} m/s`);
+    updateWeatherIcon(data.weather[0].description);
+    $('#weather-info').fadeIn();
+}
 
 function showToast(title, message) {
     const toast = $(`
