@@ -3,10 +3,6 @@ const geocodeUrl = 'http://api.openweathermap.org/geo/1.0/direct';
 const reverseGeocodeUrl = 'http://api.openweathermap.org/geo/1.0/reverse';
 const apiKey = 'f00c38e0279b7bc85480c3fe775d518c';
 
-$(document).ready(function () {
-    weatherFn('Pune');
-});
-
 async function weatherFn(cName) {
     const temp = `${weatherUrl}?q=${cName}&appid=${apiKey}&units=metric`;
     try {
@@ -125,6 +121,7 @@ function showToast(title, message) {
         toast.removeClass('active');
         setTimeout(() => {
             toast.remove();
+            repositionToasts(); // Reposition remaining toasts after one is removed
         }, 500); // Allow for the exit transition before removing from DOM
     }, 3000); // Display for 3 seconds
 
@@ -132,7 +129,18 @@ function showToast(title, message) {
         toast.removeClass('active');
         setTimeout(() => {
             toast.remove();
+            repositionToasts(); // Reposition remaining toasts after one is closed
         }, 500); // Allow for the exit transition before removing from DOM
+    });
+}
+
+function repositionToasts() {
+    const toasts = $('#toast-container .toast');
+    let offset = 20; // Initial offset from the top
+
+    toasts.each(function() {
+        $(this).css('top', `${offset}px`);
+        offset += $(this).outerHeight() + 20; // Adjust offset for next toast
     });
 }
 
@@ -259,4 +267,22 @@ $(document).on({
     "mouseup": function(e) { 
         console.log("normal mouse up:", e.which); 
     }
+});
+
+
+//----- empty input
+let locationButtonClicked = false;
+document.addEventListener('DOMContentLoaded', function() {
+    const cityInputBtn = document.getElementById('city-input-btn'); // Replace with your button's ID
+    const getLocationBtn = document.getElementById('get-location'); // Replace with your button's ID
+
+    cityInputBtn.addEventListener('click', function() {
+        const cityInput = document.getElementById('city-input').value.trim();
+        if (!cityInput && !locationButtonClicked) {
+            showToast('Error', 'City input field is empty. Please enter a city name.');
+        } else {
+            locationButtonClicked = false; // Reset the flag
+            weatherFn(cityInput); // Call your weather function if the input is not empty
+        }
+    });
 });
