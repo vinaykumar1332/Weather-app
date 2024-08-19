@@ -10,7 +10,6 @@ body {
     background-image:url("./back-ground-image.jpg") ;
     background-repeat: no-repeat;
     background-size: cover;
-    backdrop-filter: blur(5px);
 }
 .main-container{
     display: flex;
@@ -438,7 +437,7 @@ body {
 #location{
   font-weight: 500;
   background:#2196F3 ;
-  max-width: fit-content;
+  max-width: max-content;
   padding: 8px 16px;
   color: #fff;
   display: inline-flex;

@@ -253,21 +253,21 @@ function showError(error) {
   }
 
 
-//right click
-$(document).on({
-    "contextmenu": function (e) {
-        console.log("ctx menu button:", e.which); 
+// //right click
+// $(document).on({
+//     "contextmenu": function (e) {
+//         console.log("ctx menu button:", e.which); 
 
-        // Stop the context menu
-        e.preventDefault();
-    },
-    "mousedown": function(e) { 
-        console.log("normal mouse down:", e.which); 
-    },
-    "mouseup": function(e) { 
-        console.log("normal mouse up:", e.which); 
-    }
-});
+//         // Stop the context menu
+//         e.preventDefault();
+//     },
+//     "mousedown": function(e) { 
+//         console.log("normal mouse down:", e.which); 
+//     },
+//     "mouseup": function(e) { 
+//         console.log("normal mouse up:", e.which); 
+//     }
+// });
 
 
 //----- empty input
@@ -286,3 +286,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+//--first - one
+
+async function fetchTikTokVideos() {
+    const accessToken = 'your_access_token'; // Replace with your actual access token
+
+    try {
+        const response = await fetch('https://open.tiktokapis.com/v2/video/list/?fields=id,title,video_description,duration,cover_image_url,embed_link', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                max_count: 20
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch TikTok videos');
+        }
+
+        const data = await response.json();
+        renderTikTokVideos(data.data.videos);
+
+    } catch (error) {
+        console.error('Error fetching TikTok videos:', error);
+    }
+}
+
+function renderTikTokVideos(videos) {
+    const tiktokFeed = document.getElementById('tiktokFeed');
+
+    videos.forEach(video => {
+        const videoElement = document.createElement('div');
+        videoElement.classList.add('video-container');
+
+        videoElement.innerHTML = `
+            <h2>${video.title}</h2>
+            <p>${video.video_description}</p>
+            <img src="${video.cover_image_url}" alt="${video.title}">
+            <iframe src="${video.embed_link}&autoplay=1&mute=1" frameborder="0" allowfullscreen></iframe>
+        `;
+
+        tiktokFeed.appendChild(videoElement);
+    });
+}
+
+// Call the function to fetch and display the videos
+fetchTikTokVideos();
+

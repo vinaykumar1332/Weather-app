@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Video Feed</title>
+    <style>
+        .video-container {
+            margin-bottom: 20px;
+        }
+
+        .video-container img {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            max-width: 300px;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div id="tiktokFeed"></div>
+    <div>
+        Let's break down the TikTok API usage for fetching and displaying a user's recent videos, based on the example you provided from the official TikTok documentation.
+
+Purpose:
+You want to display a user's most recent TikTok videos on your platform. To achieve this, you will use the /v2/video/list/ API endpoint to fetch the videos and then embed them on your webpage.
+
+1. Authorization Process:
+Before you can fetch videos, the user must authorize your application to access their TikTok data.
+
+Authorization Flow:
+The user logs in and grants permission to your app via the OAuth 2.0 flow.
+You obtain an authorization code, which you exchange for an access token.
+The access token is then used to authenticate requests to the TikTok API.
+2. API Request: Fetching Recent Videos
+Once you have the access token, you can make a request to the /v2/video/list/ endpoint to retrieve a list of the user's most recent videos.
+    </div>
+
+    <script>
+        async function fetchTikTokVideos() {
+            const accessToken = 'your_access_token'; // Replace with your actual access token
+
+            try {
+                const response = await fetch('https://open.tiktokapis.com/v2/video/list/?fields=id,title,video_description,duration,cover_image_url,embed_link', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        max_count: 20
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch TikTok videos');
+                }
+
+                const data = await response.json();
+                renderTikTokVideos(data.data.videos);
+
+            } catch (error) {
+                console.error('Error fetching TikTok videos:', error);
+            }
+        }
+
+        function renderTikTokVideos(videos) {
+            const tiktokFeed = document.getElementById('tiktokFeed');
+
+            videos.forEach(video => {
+                const videoElement = document.createElement('div');
+                videoElement.classList.add('video-container');
+
+                videoElement.innerHTML = `
+                    <h2>${video.title}</h2>
+                    <p>${video.video_description}</p>
+                    <img src="${video.cover_image_url}" alt="${video.title}">
+                    <iframe src="${video.embed_link}" frameborder="0" allowfullscreen></iframe>
+                `;
+
+                tiktokFeed.appendChild(videoElement);
+            });
+        }
+
+        // Fetch and render TikTok videos when the page loads
+        fetchTikTokVideos();
+    </script>
+    <script></script>
+</body>
+</html>
